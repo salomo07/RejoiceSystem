@@ -7,7 +7,7 @@ import styles from "./styles";
 import Functions from "./../../Functions.js";
 import Splash from "../login/splash";
 
-import firebase from '@react-native-firebase/app';
+import messaging from '@react-native-firebase/messaging';
 
 const launchscreenBg = require("../../../assets/launchscreen-bg.png");
 const launchscreenLogo = require("../../../assets/logo-kitchen-sink.png");
@@ -20,7 +20,10 @@ class Login extends Component {
     // this.props.navigation.navigate('AppNavigator');
   }
   componentWillUnmunt(){
-
+    this.registerAppWithFCM();
+  }
+  registerAppWithFCM() {
+    messaging().registerForRemoteNotifications().then((res)=>{console.log(res)});
   }
   componentDidMount(){
     // new Functions().localStorage.removeItem('userData');

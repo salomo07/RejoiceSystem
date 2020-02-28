@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { FlatList, AsyncStorage,View,TextInput,ScrollView} from "react-native";
+import { FlatList,View,TextInput,ScrollView} from "react-native";
 import {Container,Header,Title,Content,Button,Text,Left,Body,Right,List,ListItem} from "native-base";
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Splash from "../login/splash";

@@ -11,7 +11,13 @@ const server = require('http').createServer(app);
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
-var fcm = require('fcm-notification');
-var FCM = new fcm('./serviceAccountKey.json');
+// var fcm = require('fcm-notification');
+// var FCM = new fcm('./serviceAccountKey.json');
 
-module.exports = {Mongo,app,express,bodyParser,cookieParser,http,path,server,bcrypt,saltRounds,FCM}
+var admin = require('firebase-admin');
+var serviceAccount = require("./serviceAccountKey.json");
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+module.exports = {Mongo,app,express,bodyParser,cookieParser,http,path,server,bcrypt,saltRounds,admin}

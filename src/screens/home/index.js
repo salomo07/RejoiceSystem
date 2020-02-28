@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { StatusBar, AsyncStorage,ScrollView,Image,Dimensions,TouchableOpacity} from "react-native";
+import { StatusBar,ScrollView,Image,Dimensions,TouchableOpacity} from "react-native";
+import AsyncStorage from '@react-native-community/async-storage';
 import { Card, CardItem, Left, Right, Body, Thumbnail, Container, Button, Text, Header, Icon, Title, Tabs, Tab, ScrollableTab, TabHeading, View, Item, Input } from "native-base";
 
 

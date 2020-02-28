@@ -7,13 +7,13 @@ class Mongo {
   constructor(){
     
   }
-  update(coll,filter,data,callback)
+  update(coll,filter,data)
   {
     MongoClient.connect(url,{useNewUrlParser: true}, function(err, client) {
       if (err) {console.log("Cannot connect to database : ",err);}
       else
       {
-        client.db(dbName).collection(coll).updateOne(filter, { $set: data }, (err, res) =>{console.log('Data updated')});
+        client.db(dbName).collection(coll).updateOne(filter,{ $set: data }, (err, res) =>{console.log('Data updated')});
         client.close();
       }
     });
@@ -76,15 +76,26 @@ class Mongo {
       }
     });
   }
-  find(coll,filter,callback)
+  find(coll,filter,sort,callback)
   { 
     MongoClient.connect(url,{useNewUrlParser: true}, function(err, client) {
       if (err) {console.log("Cannot connect to database : ",err);}
       else
       {
-        client.db(dbName).collection(coll).find(filter).toArray((err, data) =>{
+        client.db(dbName).collection(coll).find(filter).sort(sort).toArray((err, data) =>{
           callback(data);
         });
+        client.close();
+      }
+    });
+  }
+  insertOne(coll,doc){
+    MongoClient.connect(url,{useNewUrlParser: true}, function(err, client) {
+      if (err) {console.log("Cannot connect to database : ",err);}
+      else
+      {
+        doc.time=new Date();
+        client.db(dbName).collection(coll).insertOne(doc);
         client.close();
       }
     });
@@ -92,20 +103,15 @@ class Mongo {
   aggregate(coll1,coll2,localfield,foreignfield,aka,filter,callback)
   {
     MongoClient.connect(url,{useNewUrlParser: true}, function(err, client) {
-
       if (err) {console.log("Cannot connect to database : ",err);}
       else
       {
-        // client.db(dbName).collection(coll).find(filter).toArray((err, data) =>{
-        //   callback(data);
-        // });
-        // client.close();
         var label="$"+aka;
         client.db(dbName).collection(coll1).aggregate(
           [           
             {'$lookup': {from:coll2,localField:localfield,foreignField:foreignfield,as:aka}},
             {'$match':filter},
-            { '$unwind' : label }
+            {'$unwind': label}
           ], 
           (err, cursor)=> {
             cursor.toArray((err, data)=> {
@@ -115,26 +121,6 @@ class Mongo {
         );
       }
     });
-    // client.connect((err)=> 
-    // {  
-    //   if (err) {callback(err,null);}
-    //   else
-    //   {
-    //     var collection=client.db(dbName).collection(coll1);
-    //     collection.aggregate(
-    //       [            
-    //         {'$lookup': {from:coll2,localField:localfield,foreignField:foreignfield,as:aka}},
-    //         {'$match':filter}
-    //       ], 
-    //       (err, cursor)=> {
-    //         cursor.toArray((err, data)=> {
-    //           callback(err,data);
-    //         });
-    //       }
-    //     );
-    //   }  
-    //   client.close();
-    // });
   }
 }
 module.exports = Mongo;

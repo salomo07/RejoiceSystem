@@ -134,7 +134,7 @@
 		color: white;
 	}
 	.user_info p{
-	font-size: 10px;
+	font-size: 15px;
 	color: rgba(255,255,255,0.6);
 	}
 	.video_cam{
@@ -152,7 +152,7 @@
 		margin-bottom: auto;
 		margin-left: 10px;
 		border-radius: 25px;
-		background-color: #82ccdd;
+		background-color: #78e08f;
 		padding: 10px;
 		position: relative;
 	}
@@ -161,7 +161,7 @@
 		margin-bottom: auto;
 		margin-right: 10px;
 		border-radius: 25px;
-		background-color: #78e08f;
+		background-color: #82ccdd;
 		padding: 10px;
 		position: relative;
 	}

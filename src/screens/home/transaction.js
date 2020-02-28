@@ -1,5 +1,5 @@
 import React, { Component} from "react";
-import { StatusBar, AsyncStorage,View,Platform,DatePickerAndroid,DatePickerIOS} from "react-native";
+import { StatusBar,View,Platform,DatePickerAndroid,DatePickerIOS} from "react-native";
 import {Container,Header,Content,Button,Form,Left,Right,Radio,Card,CardItem,Body} from "native-base";
 import Header1 from "../Header/Header1";
 import styles from "./styles";

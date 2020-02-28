@@ -1,28 +1,54 @@
-var {Mongo,app,express,bodyParser,cookieParser,http,path,server,bcrypt,saltRounds,FCM} =require ("./init.js");
-var token = 'eVvucQXMInM:APA91bGBluv5EWYMFs7G5RkpPAmVAcZWmJauySDX3ZIy0npSsms1y9wNJsKoIz5Mxdw51Xh59FNlD8YPmssay728IlY22FSJjMVNIAr2v0LGdwrUH3ob7HxQLUaym2o1tQV6X5gz-Xb9';
- 
-var message ={
-	"token" : token,
-	"data":{
-      "Nick" : "Mario",
-      "body" : "great match!"
-    }
-}
-// "notification" : {"title":"Portugal vs. Denmark","body":"Bodyyyyyyyyyyyyyyyyyyyy"}	
+var {Mongo,app,express,bodyParser,cookieParser,http,path,server,bcrypt,saltRounds,admin} =require ("./init.js");
+var token = 'cnLPswIVwnQ:APA91bHO_u8Q0ai8qeP7dztZbIcpdrB--Gw3kUWcAkR5PGMlFDoBHT1ZaZgX8at2yzy2shyZHHMZviN4_5F8iByUNlhz_jc_vrNUSOOOgjQe5_sUauipiEXNE4LQ2A_CS7o37jnBDiVb';
 
-// FCM.send(message, function(err, response) {
-//     if(err){
-//         console.log(err.errorInfo.message);
-//     }
-// })
+
+function sendMessage(idsender,idreceiver,messagedata){
+	new Mongo().find("users",{"$or":[{_id:idsender},{_id:idreceiver}]},{},(res)=>{
+		var tokens=[];
+		var sender;		
+
+		res.map((val,i)=>{
+			if(val._id==idsender)
+			{sender=val;}
+			if(val._id==idreceiver)
+			{	
+				var token=val.token;
+				if(token.web!=undefined && token.web!=""){tokens.push(token.web)}
+				if(token.android!=undefined && token.android!=""){tokens.push(token.android)}
+				if(token.ios!=undefined && token.ios!=""){tokens.push(token.ios)}
+			}
+		});
+		tokens.map((token,i)=>{
+			// messagedata=JSON.stringify(messagedata);
+			messagedata.time=messagedata.time.toString();
+			delete messagedata._id;
+			// console.log(messagedata)
+			var message={
+				"token" : token,
+				"data":messagedata,
+			    "notification" : {"title":sender.profile.firstname+" "+sender.profile.lastname,"body":messagedata.message},
+			    "webpush": {
+			      "fcm_options": {
+			        "link": "https://rejoicesystemwebsite.herokuapp.com/chat"
+			      }
+			    }
+			}
+			admin.messaging().send(message).then((response) => {console.log('Successfully sent message:', response);}).catch((error) => {console.log('Error sending message:', error);});
+		});
+	})
+}
+
 
 server.listen(process.env.PORT || 3000,()=>{
 });
 app.use(express.static(__dirname + '/assets'));
+app.use(express.static(__dirname));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(cookieParser());
+app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'html');
 
 app.get('/',(req,returnAPI)=>{
 	// new Mongo().streamMongo((err,res)=>{
@@ -30,7 +56,7 @@ app.get('/',(req,returnAPI)=>{
 	// });
 
 	if(req.cookies.userdata ==undefined)
-	returnAPI.sendFile(path.join(__dirname + '/login.html'));
+	returnAPI.sendFile(path.join(__dirname + '/views/login.html'));
 	else returnAPI.redirect('/chat')
 });
 app.post('/api',(req,returnAPI)=>{	
@@ -38,10 +64,8 @@ app.post('/api',(req,returnAPI)=>{
 });
 app.get('/chat',(req,returnAPI)=>{
 	if(req.cookies.userdata ==undefined)
-	{
-		returnAPI.redirect('/')
-	}
-	else returnAPI.sendFile(path.join(__dirname + '/chat.html'));
+	{returnAPI.redirect('/')}
+	else returnAPI.render(path.join(__dirname + '/views/chat.html'), {"dataUser":req.cookies.userdata});
 });
 
 app.post('/loginweb',(req,returnAPI)=>{
@@ -57,7 +81,7 @@ app.post('/loginweb',(req,returnAPI)=>{
 	//   console.log(hash);
 	// });
 	new Mongo().findOne('users',req.body,(res)=>{
-		console.log(res)
+		// console.log(res)
 		if(res==null)
 		{returnAPI.redirect('/');}
 		else
@@ -66,8 +90,7 @@ app.post('/loginweb',(req,returnAPI)=>{
 				if(r==true)
 				{
 					new Mongo().findUserDetail(req.body,(res)=>{
-						
-						returnAPI.cookie('userdata',res._id,{maxAge: 3600000*8});
+						returnAPI.cookie('userdata',{_id:res._id,profile:res.profile,token:res.token},{maxAge: 3600000*8});
 						returnAPI.redirect('/chat');
 					});
 				}
@@ -79,7 +102,6 @@ app.post('/loginweb',(req,returnAPI)=>{
 });
 app.post('/api/getuserdetail/',(req,returnAPI)=>{ //Should have "password" on request and username must equals
 	var userData, reqPassword;
-	// console.log(req);
 	// console.log(req.protocol,typeof req.headers.accept);
 	if (req.body.username!=undefined) {
 		req.body.username={'$eq' : req.body.username}
@@ -111,19 +133,36 @@ app.post('/api/getuserdetail/',(req,returnAPI)=>{ //Should have "password" on re
 	});
 });
 app.post('/api/updateuser',(req,returnAPI)=>{
-	new Mongo().update('users',{_id:req.body._id},req.body,(res)=>{});
+	new Mongo().update('users',req.body.filter,req.body.data);
+	returnAPI.json([]);
 });
-app.post('/api/getdata',(req,returnAPI)=>{
-	// new Mongo().find(req.query.coll,req.body,(res)=>{
-	// 	console.log(res)
-	// 	returnAPI.json(res);
-	// })
-	// console.log(req)
-	new Mongo().aggregate(req.body.coll1,req.body.coll2,req.body.localfield,req.body.foreignfield,'data',req.query,(res)=>{
+app.post('/api/getdatajoin',(req,returnAPI)=>{
+	new Mongo().aggregate(req.body.coll1,req.body.coll2,req.body.localfield,req.body.foreignfield,'data',req.body.filter,(res)=>{
 		returnAPI.json(res);
 	})
-	// ('users',{_id:req.body._id},req.body,(res)=>{});
 });
-// app.get('/favicon.ico', (req, res) => {
-// 	res.sendStatus(404);
+app.post('/api/findMany',(req,returnAPI)=>{
+	new Mongo().find(req.body.coll,req.body.filter,req.body.sort,(res)=>{
+		returnAPI.json(res);
+	})
+});
+app.post('/api/findOne',(req,returnAPI)=>{
+	new Mongo().findOne(req.body.coll,req.body.filter,(res)=>{
+		returnAPI.json(res);
+	})
+});
+app.post('/api/insertOne',(req,returnAPI)=>{
+	new Mongo().insertOne(req.body.coll,req.body.document);
+	if(req.body.sender!=undefined)
+	{
+		sendMessage(req.body.sender,req.body.receiver,req.body.document);
+	}
+	returnAPI.json([]);
+});
+app.get('/signout',(req,returnAPI)=>{
+	returnAPI.clearCookie("userdata");
+	returnAPI.redirect('/');
+});
+// app.get('/favicon.ico', (req, returnAPI) => {
+// 	returnAPI.sendStatus(404);
 // });

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "952514227777",
+    "firebase_url": "https://rejoicesystem.firebaseio.com",
+    "project_id": "rejoicesystem",
+    "storage_bucket": "rejoicesystem.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:952514227777:android:cc696789d856ad0c0520c0",
+        "android_client_info": {
+          "package_name": "com.rejoicesystem"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "952514227777-6qgbh3hsl8u87c09e40iuvh295586q1v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBc591CoDu0UGEIxtSCDbiIiKvkfp3i-q0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "952514227777-6qgbh3hsl8u87c09e40iuvh295586q1v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,6 +1,4 @@
 var {Mongo,app,express,bodyParser,cookieParser,http,path,server,bcrypt,saltRounds,admin} =require ("./init.js");
-var token = 'cnLPswIVwnQ:APA91bHO_u8Q0ai8qeP7dztZbIcpdrB--Gw3kUWcAkR5PGMlFDoBHT1ZaZgX8at2yzy2shyZHHMZviN4_5F8iByUNlhz_jc_vrNUSOOOgjQe5_sUauipiEXNE4LQ2A_CS7o37jnBDiVb';
-
 
 function sendMessage(idsender,idreceiver,messagedata){
 	new Mongo().find("users",{"$or":[{_id:idsender},{_id:idreceiver}]},{},(res)=>{
@@ -12,7 +10,7 @@ function sendMessage(idsender,idreceiver,messagedata){
 			{sender=val;}
 			if(val._id==idreceiver)
 			{	
-				var token=val.token;
+				var token=val.token;tokens=[];
 				if(token.web!=undefined && token.web!=""){tokens.push(token.web)}
 				if(token.android!=undefined && token.android!=""){tokens.push(token.android)}
 				if(token.ios!=undefined && token.ios!=""){tokens.push(token.ios)}
@@ -22,10 +20,11 @@ function sendMessage(idsender,idreceiver,messagedata){
 			// messagedata=JSON.stringify(messagedata);
 			messagedata.time=messagedata.time.toString();
 			delete messagedata._id;
-			// console.log(messagedata)
+			// console.log(token)
 			var message={
 				"token" : token,
 				"data":messagedata,
+				// { sender: 'TY62Q4jJuKTQWcf7Y',receiver: 'q4sKzvQtDdvpyFihM',file: '',message: 'erer',time:new Date().toString()},
 			    "notification" : {"title":sender.profile.firstname+" "+sender.profile.lastname,"body":messagedata.message},
 			    "webpush": {
 			      "fcm_options": {

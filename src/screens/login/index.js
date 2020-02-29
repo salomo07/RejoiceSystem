@@ -60,12 +60,6 @@ class Login extends Component {
             else
             {    
               new Functions().setDataToStorage('userData',res);
-              // firebase.messaging().getToken().then(fcmToken => {
-              //   if (fcmToken) {
-              //     new Functions().getJSONFromURLInternal('api/updateuser',{_id:res._id,token:fcmToken},(err,res)=>{});
-              //   }
-              // });
-              console.log('aaaaazzzz',this.props)
               this.props.refreshNavigation(res);
               this.props.navigation.navigate('AppNavigator');
             }
@@ -92,7 +86,7 @@ class Login extends Component {
             <KeyboardAvoidingView behavior="padding" enabled>
             <View style={styles.form}>
               <Form >
-                <TextInput style={{borderColor:"#ccff00"}} mode='outlined' label="Username" value={this.state.username} onChangeText={(username) => {this.setState({username});}}/>
+                <TextInput style={{borderColor:"#ccff00"}} mode='flat' label="Username" value={this.state.username} onChangeText={(username) => {this.setState({username});}}/>
 
                 <TextInput style={{borderColor:"#ccff00"}} secureTextEntry={!this.state.checked} value={this.state.password} mode='outlined' label="Password" style={{marginTop:10}} onChangeText={(password) => {this.setState({password});}} />
               </Form>

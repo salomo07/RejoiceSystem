@@ -47,7 +47,6 @@ class FriendList extends React.Component {
             $(ele.target).closest('li').attr('class','active');
             var filter={ $or :[{$and: [ { sender: friend.data._id }, { receiver:idUser } ]} , {$and: [ { sender: idUser }, { receiver: friend.data._id} ]}] };
             loadData("/api/findMany",{coll:"chats",filter:filter,sort:{time:1}},(res)=>{
-              console.log(res)
               ReactDOM.render(<DetailChat friend={friend} chats={res} />, document.querySelector('#detailChat'));
               currentChat=res;selectedFriend=friend;
             });
@@ -102,7 +101,6 @@ class DetailChat extends React.Component {
     
     ReactDOM.render(<Chats friend={selectedFriend} chats={currentChat}/>, document.querySelector('#chats'));
     loadData("/api/insertOne",{coll:"chats",document:message,receiver:receiver,sender:idUser},(res)=>{});
-    $("#txtMessage").val(""); 
   }
   render() {
     if(this.props.friend != undefined)
@@ -143,18 +141,13 @@ class DetailChat extends React.Component {
                 <div class="input-group-append">
                     <span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span>
                 </div>
-                <textarea id="txtMessage" class="form-control type_msg" placeholder="Type your message..."onKeyPress={(e)=>{
-                  if (e.which == '13') {
-                    this.sendMessage(friend.data._id);
-                  }
-                  
-                }} 
-                onKeyUp={(e)=>{
+                <textarea id="txtMessage" class="form-control type_msg" placeholder="Type your message..." onKeyUp={(e)=>{
                   txtMessage=$(e.target).val();
                 }}>
                 </textarea>
                 <div class="input-group-append" onClick={()=>{
-                  this.sendMessage(friend.data._id);
+                    this.sendMessage(friend.data._id);
+                    $("#txtMessage").val("");
                 }}>
                     <span class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></span>
                 </div>
@@ -236,7 +229,6 @@ Notification.requestPermission().then((permission) => {
 });
 
 messaging.onMessage((res) => {
-  console.log("Terima",res);
   if(selectedFriend){
     if(res.data.receiver==selectedFriend.iduser)
     {
@@ -244,5 +236,4 @@ messaging.onMessage((res) => {
       ReactDOM.render(<Chats friend={selectedFriend} chats={currentChat}/>, document.querySelector('#chats'));
     }
   }
-  
 });

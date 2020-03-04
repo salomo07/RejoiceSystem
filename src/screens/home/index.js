@@ -1,11 +1,12 @@
 import React, { Component } from "react";
+
 import { StatusBar,ScrollView,Image,Dimensions,TouchableOpacity} from "react-native";
-import AsyncStorage from '@react-native-community/async-storage';
 import { Card, CardItem, Left, Right, Body, Thumbnail, Container, Button, Text, Header, Icon, Title, Tabs, Tab, ScrollableTab, TabHeading, View, Item, Input } from "native-base";
 
+import AsyncStorage from '@react-native-community/async-storage';
 
 import Functions from "./../../Functions.js";
-
+var DomParser = require('react-native-html-parser').DOMParser;
 const deviceWidth = Dimensions.get("window").width;
 const cardImage = require("../../../assets/drawer-cover.png");
 const logo = require("../../../assets/logo.png");
@@ -14,6 +15,7 @@ var Cards;
 class Home extends Component {
   constructor(props) {
     super(props);
+    console.log('homeeeeee',this.props)
   }
   
   async componentWillMount(){
@@ -30,6 +32,7 @@ class Home extends Component {
 
       {name:"Sucorinvest Money Market Fund",code:"SMMF",cat:"Reksadana Pasar Uang",
       history:[
+      {"Transaction":"Sell",Price:508200,Date:"13-02-20",Unit:350},
       {"Transaction":"Buy",Price:2500000,Date:"06-02-20",Unit:1724.1142},
       {"Transaction":"Buy",Price:4300000,Date:"08-01-20",Unit:2982.2383},
       {"Transaction":"Sell",Price:1002651,Date:"30-10-19",Unit:705.0000},
@@ -51,7 +54,16 @@ class Home extends Component {
       {ToastAndroid.show("An error occurred.",ToastAndroid.SHORT);}
       else
       {this.setState({nav:res});}
-    });    
+    }); 
+    new Functions().getHTMLFromURL("http://capital-asset.co.id",(err,res)=>{
+      if(err)
+      {ToastAndroid.show("An error occurred.",ToastAndroid.SHORT);}
+      else
+      {
+        var doc = new DomParser().parseFromString(res,'text/html')
+        console.log('Capital',doc.getElementsByClassName('.table table-hover'))
+      }
+    });   
   }
   clearUserData(){
     new Functions().localStorage.removeItem('userData');
@@ -125,6 +137,27 @@ class Home extends Component {
         );
       })
     }
+    else{
+      return (
+        <Card>
+            <CardItem bordered>
+              <Left>
+                <Thumbnail />
+                <Body>
+                  <Text>...</Text>
+                  <Text note>...</Text>
+                </Body>
+              </Left>
+            </CardItem>
+
+            <CardItem>
+              <Body>
+              
+              </Body>
+            </CardItem>
+          </Card>
+      )
+    }
     return Cards;
   }
   
@@ -142,34 +175,18 @@ class Home extends Component {
             <Text>Search</Text>
           </Button>
         </Header>
-        <Tabs tabBarPosition="bottom" renderTabBar={() => <ScrollableTab />}>
-          <Tab heading={
-              <TabHeading >
-              <Icon type="FontAwesome" name="home" style={{fontSize:20}} />
-              <Text style={{fontSize:10}}>Home</Text>
-              </TabHeading>
-            }>
-            
-            <ScrollView style={{zIndex:999, height:300}}>
-              {this.getCardComponent()}
-              
-            </ScrollView>
+
+        <Tabs>
+          <Tab heading="Tab1">
+            {this.getCardComponent()}
           </Tab>
-          <Tab heading={
-              <TabHeading>
-                <Icon type="FontAwesome" name="user" style={{fontSize:20}} />
-                <Text style={{fontSize:10}}>Account</Text>
-              </TabHeading>
-            }>
-            
-            <ScrollView style={{ flex: 1 }}>
+          <Tab heading="Tab2">
             <Button block style={{ margin: 15, marginTop: 10 }} onPress={() => this.clearUserData()}>
               <Text>Clear Userdata</Text>
             </Button>
             <Button block style={{ margin: 15, marginTop: 10 }} onPress={() => this.props.navigation.openDrawer()}>
               <Text>Menu</Text>
             </Button>
-            </ScrollView>
           </Tab>
         </Tabs>
       </Container>

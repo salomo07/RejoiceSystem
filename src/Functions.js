@@ -7,41 +7,7 @@ class Functions {
 	localStorage=AsyncStorage;
 	async getJSONFromURL(url,data,callback) //Internal API
 	{		
-		var requestInfo={
-		  method: 'POST',
-		  headers: {
-		    Accept: 'application/json',
-		    'Content-Type': 'application/json',
-		  },
-		  body: JSON.stringify(data),
-		  timeout:0
-		};
-
-		try {
-
-			var response;
-			setTimeout(()=>{
-				if(response==undefined)
-				{callback("Error",null);}
-			}, 5000);
-
-			response = await fetch(url,requestInfo);
-			var responseJson = await response.json();
-			
-
-			if(responseJson.Error!==undefined)
-			{callback(responseJson.Error,null);}
-			else{callback(null,responseJson);}
-		} 
-		catch (error) {
-			console.log(error);
-			callback("Error",null);
-		}
-	}
-	async getJSONFromURLInternal(url,data,callback)
-	{		
-		var url=AppDesc.ipServer+":3000/"+url;
-		// console.log(url);
+		console.log(url,data);
 		var requestInfo={
 		  method: 'POST',
 		  headers: {

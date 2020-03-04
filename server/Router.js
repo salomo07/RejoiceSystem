@@ -1,10 +1,8 @@
 var {Mongo,app,express,bodyParser,cookieParser,http,path,server,bcrypt,saltRounds,admin} =require ("./init.js");
 
 function sendMessage(idsender,idreceiver,messagedata){
+	var tokens=[];var sender;	
 	new Mongo().find("users",{"$or":[{_id:idsender},{_id:idreceiver}]},{},(res)=>{
-		var tokens=[];
-		var sender;		
-
 		res.map((val,i)=>{
 			if(val._id==idsender)
 			{sender=val;}
@@ -17,14 +15,10 @@ function sendMessage(idsender,idreceiver,messagedata){
 			}
 		});
 		tokens.map((token,i)=>{
-			// messagedata=JSON.stringify(messagedata);
+
 			messagedata.time=messagedata.time.toString();
 			delete messagedata._id;
-			// console.log(token)
-			var message={
-				"token" : token,
-				"data":messagedata,
-				// { sender: 'TY62Q4jJuKTQWcf7Y',receiver: 'q4sKzvQtDdvpyFihM',file: '',message: 'erer',time:new Date().toString()},
+			var message={"token" : token,"data":messagedata,
 			    "notification" : {"title":sender.profile.firstname+" "+sender.profile.lastname,"body":messagedata.message},
 			    "webpush": {
 			      "fcm_options": {

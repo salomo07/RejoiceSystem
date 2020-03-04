@@ -27,32 +27,31 @@ var screenList={"Transaction":Transaction,"Report":Report,"Detail":Detail,"Maste
 
 
 var userdata,platformOS=Platform.OS;
-class DrawerComponent extends Component {
+class AppNavigator extends Component {
     constructor(props){
         super(props);
+        
     }
-    render(){
-        return (
-            <Drawer.Navigator initialRouteName="Home" drawerPosition="right" drawerContent={props => { return <SideBar {...props} datauser={userdata} /> }}>
-                <Drawer.Screen name="Home" component={Home} />
-                {this.props.userdata!=undefined ? 
-                    this.props.userdata.menu2.map((val,i)=>{
-                        return (<Drawer.Screen key={i} name={val.url} component={screenList[val.url]} />)
-                    }): ""
-                }
-                {this.props.userdata!=undefined ? 
-                    this.props.userdata.menu1.map((val,i)=>{
-                        return (<Drawer.Screen key={i} name={val.url} component={screenList[val.url]} />)
-                    }): ""
-                }
-            </Drawer.Navigator>
-        );
+    render()
+    {
+        return (<Drawer.Navigator drawerPosition="right" drawerContent={props => {return <SideBar {...props} datauser={this.props.userdata} /> }}>
+            <Drawer.Screen  name="Home" component={(props)=>{return <Home {...props}/>}} />
+            {
+                this.props.userdata.menu1.map((val,i)=>{
+                    return (<Drawer.Screen key={i} name={val.url} component={screenList[val.url]} />)
+                })
+            }
+            {
+                this.props.userdata.menu2.map((val,i)=>{
+                    return (<Drawer.Screen key={i} name={val.url} component={screenList[val.url]} />)
+                })
+            }
+        </Drawer.Navigator>)
     }
 }
 class Navigation extends Component {
     constructor(props){
         super(props);
-        this.appState="";
     }
     componentDidMount(){
         new Functions().getDataFromStorage('userData',(err,res)=>{
@@ -61,7 +60,7 @@ class Navigation extends Component {
             {
                 userdata=res;
                 if (messaging().requestPermission()) {
-                    firebase.messaging().getToken().then((fcmToken)=>{
+                    firebase.messaging().getToken().then((fcmToken)=>{console.log('Token',fcmToken)
                         var data;
                         if(platformOS=='android')
                         {
@@ -69,15 +68,16 @@ class Navigation extends Component {
                             // firebase.messaging().setBackgroundMessageHandler(async (remoteMessage) => {
                             //     console.log('remoteMessage',remoteMessage.token);
                             // });
-                            firebase.messaging().onMessage(async (remoteMessage) => {
-                                console.log('remoteMessage',remoteMessage);
+                            firebase.messaging().onMessage(async (msg) => {
+                                ToastAndroid.show(msg.data.message, ToastAndroid.SHORT);
+                                console.log('msg',msg);
                             });
                         }
                         else
                         {
                             data={filter:{_id:res._id},data:{"token.ios":fcmToken}};
                         }
-                        new Functions().getJSONFromURLInternal('api/updateuser',data,(err,res)=>{});
+                        new Functions().getJSONFromURL(AppDesc.ipServer+'/api/updateuser',data,(err,res)=>{});
                     });
                 } 
                 else {
@@ -86,12 +86,12 @@ class Navigation extends Component {
             }            
         });
     }
-    refreshNavigation=(userdata)=>{       
+    refreshNavigation=(userdata)=>{    
+        // this.state={userdata:userdata};  
         this.setState({userdata:userdata});
     }
-    
     render()
-    {
+    { 
         if(this.state!=null)
         { 
             var initNavigator= this.state.userdata==null? "AuthNavigator" : "AppNavigator";
@@ -102,7 +102,7 @@ class Navigation extends Component {
                         <Drawer.Screen name="AppNavigator" component={
                             ()=>{
                                 return (
-                                <Drawer.Navigator initialRouteName="Home" drawerPosition="right" drawerContent={props => { return <SideBar {...props} datauser={this.state.userdata} /> }}>
+                                <Drawer.Navigator initialRouteName="Home" drawerPosition="right" drawerContent={props => { return <SideBar {...props} userdata={this.state.userdata} /> }}>
                                     <Drawer.Screen name="Home" component={Home} />
                                     {this.state.userdata.menu1.map((val,i)=>{
                                         <Drawer.Screen name={val.url}  component={screenList[val.url]} />
@@ -119,10 +119,9 @@ class Navigation extends Component {
         }
         else
         {return <Splash/>;}
+        i++;
     }
 }
-
-
 
 
 export default Navigation;

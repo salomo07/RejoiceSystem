@@ -14,18 +14,20 @@ const drawerImage = require("../../../assets/logo-kitchen-sink.png");
 class SideBar extends Component {
   constructor(props) {
     super(props);
+    // delete this.props.userdata;
+    console.log("SideBarz",this.props)
   }
   state = {expanded: true}
 
   menu1Press(url){
     this.setState({expanded: !this.state.expanded});
   }
-  getMenu(datauser){
-    return datauser.menu1.map((menu1)=>{
+  getMenu(userdata){
+    return userdata.menu1.map((menu1)=>{
       return(
         <List.Accordion key={menu1._id} title={menu1.label} style={{marginLeft:5,marginRight:5,borderBottomWidth:0.2}} left={props => <Icon style={menu1.iconstyle} name={menu1.iconname}/>} onPress={()=>{this.menu1Press(menu1.url)}} >
           {
-            datauser.menu2.map((menu2)=>{
+            userdata.menu2.map((menu2)=>{
               if(menu2.idmenu1==menu1._id)
               {  
                 return (
@@ -38,7 +40,7 @@ class SideBar extends Component {
     })
   }
   render() {
-    if(this.props.datauser!==undefined)
+    if(this.props.userdata!==undefined)
     return (
       <Container>
         <Content bounces={false} style={{backgroundColor: "#fff", top: -1 }}>
@@ -46,7 +48,7 @@ class SideBar extends Component {
           <Image square style={styles.drawerImage} source={drawerImage} />
 
           <List.Section style={{backgroundColor: "#fefefe"}}>
-            {this.getMenu(this.props.datauser)}
+            {this.getMenu(this.props.userdata)}
           </List.Section>
         </Content>
       </Container>

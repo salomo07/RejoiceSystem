@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import {ImageBackground, View, StatusBar,Alert,KeyboardAvoidingView,ToastAndroid} from "react-native";
-import {Container, H3, Content,Form, Item, Label,Button,Text} from 'native-base';
+import {ImageBackground, View, StatusBar,Alert,KeyboardAvoidingView,ToastAndroid,SafeAreaView} from "react-native";
+import {Container, H3, Content,Form, Item,Label,Button,Text} from 'native-base';
 import {TextInput,Checkbox,Snackbar,ActivityIndicator,Colors} from 'react-native-paper';
 
 import styles from "./styles";
@@ -11,20 +11,17 @@ import messaging from '@react-native-firebase/messaging';
 
 const launchscreenBg = require("../../../assets/launchscreen-bg.png");
 const launchscreenLogo = require("../../../assets/logo-kitchen-sink.png");
+var AppDesc =require("../../../app.json");
 
 class Login extends Component {
   constructor(props) {
-    super(props);
-    console.log("signingIn",this.props.navigation);
-    
+    super(props);   
     // this.props.navigation.navigate('AppNavigator');
   }
   componentWillUnmunt(){
-    this.registerAppWithFCM();
+    // this.registerAppWithFCM();
   }
-  registerAppWithFCM() {
-    messaging().registerForRemoteNotifications().then((res)=>{console.log(res)});
-  }
+
   componentDidMount(){
     // new Functions().localStorage.removeItem('userData');
     new Functions().getDataFromStorage('userData',(err,res)=>{
@@ -50,8 +47,8 @@ class Login extends Component {
     {
       try 
       {
-        var data ={username:this.state.username,password:this.state.password};        
-        new Functions().getJSONFromURLInternal('api/getuserdetail',data,(err,res)=>{
+        var data ={username:this.state.username,password:this.state.password};      
+        new Functions().getJSONFromURL(AppDesc.ipServer+'/api/getuserdetail/',data,(err,res)=>{
           if(err)
           {ToastAndroid.show("An error occurred!", ToastAndroid.SHORT);}
           else
@@ -69,13 +66,14 @@ class Login extends Component {
         });
       } 
       catch ({ error }) {
-        ToastAndroid.show("An error occurred.",ToastAndroid.SHORT);
+        ToastAndroid.show("An error occurred..",ToastAndroid.SHORT);
         this.setState({loadIndicator:false});
       }
     }
   }
   render() {
     return (
+      <SafeAreaView style={{flex: 1}}>
       <Container >
         {this.state==null ? (<Splash/>) :
           (<ImageBackground source={launchscreenBg} style={styles.imageContainer} >
@@ -109,6 +107,7 @@ class Login extends Component {
           )
         }
       </Container>
+      </SafeAreaView>
     );
   }
 }

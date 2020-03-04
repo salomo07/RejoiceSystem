@@ -14,6 +14,7 @@ var transactionDate,nominal,transaction='Buy';
 class Transaction extends Component {
   constructor(props){
     super(props);
+    console.log(this.props,'props')
   }
   componentWillMount(){
     this.setState({transaction:"Buy",transactiondate:"",nominal:"",nominalshow:""})
@@ -52,7 +53,6 @@ class Transaction extends Component {
     
     return (
       <Container style={styles.container}>
-        <Header1 {...this.props}/>
         <Content style={styles.contain}>
           <Form >
             <RadioButton.Group

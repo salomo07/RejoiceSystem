@@ -2,8 +2,8 @@ import React, { Component } from "react";
 
 import { StatusBar,ScrollView,Image,Dimensions,TouchableOpacity} from "react-native";
 import { Card, CardItem, Left, Right, Body, Thumbnail, Container, Button, Text, Header, Icon, Title, Tabs, Tab, ScrollableTab, TabHeading, View, Item, Input } from "native-base";
-
 import AsyncStorage from '@react-native-community/async-storage';
+import { DataTable } from 'react-native-paper';
 
 import Functions from "./../../Functions.js";
 var DomParser = require('react-native-html-parser').DOMParser;
@@ -15,7 +15,6 @@ var Cards;
 class Home extends Component {
   constructor(props) {
     super(props);
-    console.log('homeeeeee',this.props)
   }
   
   async componentWillMount(){
@@ -63,7 +62,11 @@ class Home extends Component {
         var doc = new DomParser().parseFromString(res,'text/html')
         console.log('Capital',doc.getElementsByClassName('.table table-hover'))
       }
-    });   
+    });
+    var data={coll:'users'};
+    new Functions().getJSONFromURL('http://10.0.2.2:3000'+'/api/findMany',data,(err,res)=>{ 
+      this.setState({users:res});  
+    }); 
   }
   clearUserData(){
     new Functions().localStorage.removeItem('userData');
@@ -160,8 +163,12 @@ class Home extends Component {
     }
     return Cards;
   }
-  
+  getDetailUser(user)
+  {
+    this.props.navigation.navigate("DetailUser",{data:user});
+  }
   render() { 
+    var usersLength=this.state==null || this.state.users==undefined? 0: this.state.users.length;
     return (
       <Container>
         <StatusBar barStyle="light-content" />
@@ -177,12 +184,36 @@ class Home extends Component {
         </Header>
 
         <Tabs>
-          <Tab heading="Tab1">
-            {this.getCardComponent()}
+          <Tab heading="Users List">
+            <DataTable>
+              <DataTable.Header >
+                <DataTable.Title>Username</DataTable.Title>
+                <DataTable.Title>Fullname</DataTable.Title>
+                <DataTable.Title>Address</DataTable.Title>
+              </DataTable.Header>
+
+              {this.state!=null && this.state.users!=undefined && this.state.users.length>0 && 
+                this.state.users.map((val)=>{
+                  return (
+                  <DataTable.Row onPress={()=>{this.getDetailUser(val)}}>
+                    <DataTable.Cell>{val.username}</DataTable.Cell>
+                    <DataTable.Cell>{val.profile.firstname} {val.profile.lastname}</DataTable.Cell>
+                    <DataTable.Cell>{val.profile.address}</DataTable.Cell>
+                  </DataTable.Row>)
+                })
+              }
+
+              <DataTable.Pagination
+                page={0} numberOfPages={Math.ceil(usersLength/10)} onPageChange={page => {
+                  console.log(page);
+                }} label={"Total : " +usersLength}
+              />
+            </DataTable>
           </Tab>
-          <Tab heading="Tab2">
+          <Tab heading="Settings">
+            {this.getCardComponent()}
             <Button block style={{ margin: 15, marginTop: 10 }} onPress={() => this.clearUserData()}>
-              <Text>Clear Userdata</Text>
+              <Text>Sign Out</Text>
             </Button>
             <Button block style={{ margin: 15, marginTop: 10 }} onPress={() => this.props.navigation.openDrawer()}>
               <Text>Menu</Text>

@@ -6,8 +6,8 @@ class HeaderSubtitle extends Component {
     super(props);
   }
   render() {
-    const { navigation } = this.props;
-    var data=navigation.getParam('data', '');
+    // const { navigation } = this.props;
+    // var data=navigation.getParam('data', '');
     return (
       <Header hasSubtitle>
         <Left>
@@ -16,8 +16,8 @@ class HeaderSubtitle extends Component {
           </Button>
         </Left>
         <Body>
-          <Title>{data.name}</Title>
-          <Subtitle>{data.cat}</Subtitle>
+          // <Title>{data.name}</Title>
+          // <Subtitle>{data.cat}</Subtitle>
         </Body>
         <Right>
           <Button transparent onPress={() =>{this.props.navigation.openDrawer()}}>

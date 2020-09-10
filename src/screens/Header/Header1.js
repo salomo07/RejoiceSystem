@@ -6,7 +6,7 @@ class Header1 extends Component {
     super(props);
   }
   render() {
-    this.menu=this.props.navigation.state.params.menu;
+    // this.menu=this.props.navigation.state.params.menu;
     return (
       <Header>
         <Left>

@@ -83,7 +83,15 @@ class Mongo {
       else
       {
         client.db(dbName).collection(coll).find(filter).sort(sort).toArray((err, data) =>{
-          callback(data);
+          var res=[];
+          if(data.length>0)
+          {
+            data.map((v,i)=>{
+              delete v.password;
+              res.push(v);
+            });
+          }
+          callback(res);
         });
         client.close();
       }

@@ -15,7 +15,6 @@ class SideBar extends Component {
   constructor(props) {
     super(props);
     // delete this.props.userdata;
-    console.log("SideBarz",this.props)
   }
   state = {expanded: true}
 
